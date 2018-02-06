@@ -1,6 +1,8 @@
+import nltk
 from nltk.corpus import  reuters
 
 def collection_stats():
+    nltk.download('reuters')
     # List of documents
     documents = reuters.fileids()
     print(str(len(documents)) + " documents");
