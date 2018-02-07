@@ -1,5 +1,5 @@
 import reuters
 
 def bernulliNB():
-    v=reuters.extractVocabulary()
+    b=reuters.extractVocabulary()
     
