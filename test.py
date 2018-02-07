@@ -1,9 +1,7 @@
-import reuters
-from reuters import extractVocabulary
+from bernoulliNB import train_bernoulli
 
 def main():
-    #collection_stats()
-    extractVocabulary()
+   train_bernoulli()
     
     
     
