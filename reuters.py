@@ -35,15 +35,21 @@ def extractVocabulary():
     nltk.download('reuters')
     vocabulary = reuters.words()
     numdoc=len(reuters.fileids())
+    docinclass=list()
+    prior=list()
+    condprob=list()
     for c in reuters.categories():
-        print(c)
-        #docinclass[c]=reuters.fileids(c)
-        #prior[c]=docinclass[c]/numdoc
-        #for word in vocabulary:
+        index=reuters.categories().index(c)
+        docinclass.append((index,reuters.fileids(c)))
+        prior.append((index,len(docinclass.__getitem__(index))/numdoc))
+        for word in vocabulary:
+            l=list(docinclass.__getitem__(index).)
             
-    
-    
-    return vocabulary
+            #n=len(list(filter(lambda d:word in d,docinclass.__getitem__(index))))
+            #print(n)
+            #condprob[word][i]= n+1/docinclass[c]+2   
+    return vocabulary, prior
+
         
         
         
