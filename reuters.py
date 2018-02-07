@@ -29,3 +29,25 @@ def collection_stats():
  
     # Raw document
     print(reuters.raw(document_id));
+
+
+def extractVocabulary():
+    nltk.download('reuters')
+    vocabulary = reuters.words()
+    numdoc=len(reuters.fileids())
+    for c in reuters.categories():
+        print(c)
+        #docinclass[c]=reuters.fileids(c)
+        #prior[c]=docinclass[c]/numdoc
+        #for word in vocabulary:
+            
+    
+    
+    return vocabulary
+        
+        
+        
+    
+    
+    
+    

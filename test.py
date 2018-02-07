@@ -1,7 +1,10 @@
-from reuters import collection_stats
+import reuters
+from reuters import extractVocabulary
 
 def main():
-    collection_stats()
+    #collection_stats()
+    extractVocabulary()
+    
     
     
 
