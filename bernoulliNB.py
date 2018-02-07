@@ -1,2 +1,5 @@
+import reuters
 
-def bernulliNB(v):
+def bernulliNB():
+    v=reuters.extractVocabulary()
+    
