@@ -42,9 +42,9 @@ def extractVocabulary():
 
  
 def tokenize(text):
-    #code from MIguel Alvarez
     nltk.download('stopwords')
     nltk.download('punkt')
+    #code from MIguel Alvarez
     cachedStopWords = stopwords.words("english")
     min_length = 3
     words = map(lambda word: word.lower(), word_tokenize(text));
