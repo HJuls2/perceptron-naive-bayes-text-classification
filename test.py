@@ -4,7 +4,6 @@ def main():
     train_bernoulli()
     
     
-    
 
 
 
