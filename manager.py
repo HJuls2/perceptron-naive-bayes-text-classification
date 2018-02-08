@@ -37,13 +37,13 @@ def collection_stats():
 
 def extractVocabulary():
     nltk.download('reuters')
+    nltk.download('stopwords')
+    nltk.download('punkt')
     vocabulary = list(set(tokenize(reuters.raw())))
     return vocabulary
 
  
 def tokenize(text):
-    nltk.download('stopwords')
-    nltk.download('punkt')
     #code from MIguel Alvarez
     cachedStopWords = stopwords.words("english")
     min_length = 3

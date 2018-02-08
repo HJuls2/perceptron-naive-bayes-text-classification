@@ -1,7 +1,8 @@
 import manager
 from math  import log10
-from numpy import argmax
+from numpy import argmax, sort
 from nltk.corpus import reuters
+from manager import tokenize
 
 def train_bernoulli():
     vocabulary=manager.extractVocabulary()
@@ -9,6 +10,7 @@ def train_bernoulli():
     prior=dict()
     condprob=dict()
     for c in reuters.categories():
+        print("start with category "+c)
         doc_in_class=len(reuters.fileids(c))
         prior[c]=doc_in_class/numdocs
         for word in vocabulary:
@@ -16,11 +18,14 @@ def train_bernoulli():
             for doc in reuters.fileids(c):
                 doc_index=reuters.fileids(c).index(doc)
                 #parole del documento corrente
-                doc_words=reuters.words(reuters.fileids(c)[doc_index])
+                doc_words=sort(tokenize(reuters.raw(reuters.fileids(c)[doc_index])))
+                #doc_words=list(set(reuters.words(reuters.fileids(c)[doc_index])))
                 if(word in doc_words):
                     occur+=1
             condprob[(word,c)]=(occur+1)/(doc_in_class+2)
+            print(condprob.get((word,c)))
         return prior,condprob
+    
     
     
 
