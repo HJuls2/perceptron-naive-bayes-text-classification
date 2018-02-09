@@ -1,8 +1,5 @@
 
 import manager
-import nltk
-import math
-import cmath
 from nltk.corpus import reuters
 
 def train_multinomial():
@@ -18,7 +15,7 @@ def train_multinomial():
         print(c)
         for doc in reuters.fileids(c):
             text+= reuters.raw(doc)
-        category_tokens=manager.tokenize_text(text)
+        category_tokens=manager.tokenize(text)
         for word in vocabulary:
             occur[(c,word)]=( category_tokens.count(word))
         for word in vocabulary:
