@@ -26,9 +26,10 @@ def train_bernoulli(vocabulary):
 
 
 def applyBernoulli(vocabulary,doc,prior,condprob):
+    print("#### "+doc+ " ####")
     doc_voc=manager.extractVocabulary(reuters.raw(doc))
     score=dict()
-    for c in reuters.categories(doc):
+    for c in reuters.categories():
         score[c]=log10(prior[c])
         for word in vocabulary:
             if(word in doc_voc):
@@ -36,4 +37,4 @@ def applyBernoulli(vocabulary,doc,prior,condprob):
             else:
                 score[c]+=log10(1-condprob[(word,c)])
 
-    return argmax(score)
+    return max(score.values())
