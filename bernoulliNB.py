@@ -9,8 +9,7 @@ from builtins import range
 
 
 
-def train_bernoulli():
-    vocabulary=manager.extractVocabulary()
+def train_bernoulli(vocabulary):
     numdocs=len(reuters.fileids())
     prior=dict()
     condprob=dict()
@@ -23,36 +22,18 @@ def train_bernoulli():
             occur=len([doc for doc in reuters.categories(c) if word in manager.porterStemmer(list(set(reuters.words(reuters.fileids(c)[reuters.categories(c)[reuters.categories(c).index(doc)]]))))])
             condprob[(word,c)]=(occur+1)/(doc_in_class+2)
             
-        return prior,condprob
-
-    
-
-    
+    return prior,condprob
 
 
-
-def applyBernoulli(doc,prior,condprob):
-
-    voc=manager.extractVocabulary()
-
-    doc_voc=reuters.words(doc)
-
+def applyBernoulli(vocabulary,doc,prior,condprob):
+    doc_voc=manager.extractVocabulary(reuters.raw(doc))
     score=dict()
-
     for c in reuters.categories(doc):
-
         score[c]=log10(prior[c])
-
-        for word in voc:
-
+        for word in vocabulary:
             if(word in doc_voc):
-
-                score[c]+=log10(condprob(word,c))
-
+                score[c]+=log10(condprob[(word,c)])
             else:
-
-                score[c]*=log10(1-condprob(word,c))
-
-    
+                score[c]+=log10(1-condprob[(word,c)])
 
     return argmax(score)

@@ -5,41 +5,16 @@ from nltk.stem.porter import PorterStemmer
 import re
 from nltk.corpus import stopwords
 
-def collection_stats():
-    nltk.download('reuters')
-    # List of documents
-    documents = reuters.fileids()
-    print(str(len(documents)) + " documents");
- 
-    train_docs = list(filter(lambda doc: doc.startswith("train"),
-                        documents));
-    print(str(len(train_docs)) + " total train documents");
- 
-    test_docs = list(filter(lambda doc: doc.startswith("test"),
-                       documents));
-    print(str(len(test_docs)) + " total test documents");
- 
-    # List of categories
-    categories = reuters.categories();
-    print(str(len(categories)) + " categories");
- 
-    # Documents in a category
-    category_docs = reuters.fileids("acq");
- 
-    # Words for a document
-    document_id = category_docs[0]
-    document_words = reuters.words(category_docs[0]);
-    print(document_words);  
- 
-    # Raw document
-    print(reuters.raw(document_id));
-
-
-def extractVocabulary():
+def init():
     nltk.download('reuters')
     nltk.download('stopwords')
     nltk.download('punkt')
-    vocabulary = list(set(tokenize(reuters.raw())))
+    return
+    
+
+
+def extractVocabulary(text):
+    vocabulary = list(set(tokenize(text)))
     return vocabulary
 
 def porterStemmer(words):
