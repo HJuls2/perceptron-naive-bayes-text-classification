@@ -37,4 +37,4 @@ def applyBernoulli(vocabulary,doc,prior,condprob):
             else:
                 score[c]+=log10(1-condprob[(word,c)])
 
-    return max(score.values())
+    return (str(cat) for cat in score.keys() if max(score.values())==score[cat])

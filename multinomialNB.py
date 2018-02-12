@@ -1,22 +1,41 @@
 
 import manager
 from nltk.corpus import reuters
+from math  import log10
 
-def train_multinomial():
-    vocabulary=manager.extractVocabulary()
-    numdocs=len(reuters.fileids())
+def train_multinomial(train_set,categories,vocabulary):
+    numdocs=len(train_set)
     prior=dict()
-    cond_prob=dict()
+    condprob=dict()
     occur = dict()
     text=""
-    for c in reuters.categories():
-        doc_in_class=len(reuters.fileids(c))
+    for c in categories:
+        cat_tokens=list()
+        doc_in_class=len(list(doc for doc in train_set if doc in reuters.fileids(c)))
         prior[c] = doc_in_class/numdocs
-        print(c)
-        for doc in reuters.fileids(c):
-            text+= reuters.raw(doc)
-        category_tokens=manager.tokenize(text)
+        
+        text=' '.join(list(reuters.raw(doc) for doc in train_set if doc in reuters.fileids(c)))
+        cat_tokens=manager.tokenize(text)
+        
+        #cat_tokens.extend( manager.porterStemmer(reuters.words(doc)) for doc in reuters.fileids(c))
+        print(cat_tokens)
+        
         for word in vocabulary:
-            occur[(c,word)]=( category_tokens.count(word))
+            occur[(c,word)]=(cat_tokens.count(word))
         for word in vocabulary:
-            cond_prob[(word,c)]= (occur.get((c,word))+1)/(sum(occur.values())+len(vocabulary))   
+            condprob[(word,c)]= (occur[(c,word)]+1)/(sum(occur.values())+len(vocabulary))
+    
+    return prior, condprob
+
+
+def apply_multinomial(doc,categories,prior,condprob):
+    print("#### "+doc+" ####")
+    score=dict()
+    doc_tokens=manager.tokenize(reuters.raw(doc))
+    
+    for c in categories:
+        score[c]=log10(prior[c])
+        for word in doc_tokens:
+            score[c]+=log10(condprob[(word,c)])  # perchè errore?
+    
+    return (str(cat) for cat in score.keys() if max(score.values())==score[cat])
