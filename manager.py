@@ -9,7 +9,6 @@ def init():
     nltk.download('reuters')
     nltk.download('stopwords')
     nltk.download('punkt')
-    return
     
 
 
