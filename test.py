@@ -17,17 +17,21 @@ def main():
         text+=reuters.raw(t)
         
     vocabulary=sorted(extractVocabulary(text));
-    prior,condprob=train_bernoulli(train_docs,categories,vocabulary);
+    prior,condprob=train_multinomial(train_docs,categories,vocabulary);
     
     print(condprob)
+    for doc in test_docs:
+        print(apply_multinomial(vocabulary,categories,doc, prior, condprob))
+    '''
     results=np.zeros(len(test_docs))
     for d in test_docs:
         cat=(cat for cat in categories if d in reuters.fileids(cat))
-        calcCat=applyBernoulli(vocabulary,categories, d, prior, condprob)
+        calcCat=apply_multinomial(d,categories, prior, condprob)
         if(calcCat==cat):
             np.insert(results, d, 1)
             
-    print(results)   
+    print(results)
+    ''' 
 
 if __name__ == "__main__":
     main()
