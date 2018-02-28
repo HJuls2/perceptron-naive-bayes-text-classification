@@ -28,7 +28,7 @@ def train_multinomial(train_set,categories,vocabulary):
     return prior, condprob
 
 
-def apply_multinomial(doc,categories,prior,condprob):
+def apply_multinomial(vocabulary,categories,doc,prior,condprob):
     print("#### "+doc+" ####")
     score=dict()
     doc_tokens=manager.tokenize(reuters.raw(doc))
@@ -36,6 +36,7 @@ def apply_multinomial(doc,categories,prior,condprob):
     for c in categories:
         score[c]=log10(prior[c])
         for word in doc_tokens:
-            score[c]+=log10(condprob[(word,c)])  # perchè errore?
+            if word  in vocabulary:
+                score[c]+=log10(condprob[(word,c)])  # perchè errore?
     
-    return (str(cat) for cat in score.keys() if max(score.values())==score[cat])
+    return max(score,key=score.get)
