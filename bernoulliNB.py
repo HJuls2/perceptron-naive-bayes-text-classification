@@ -5,27 +5,22 @@ from nltk.corpus import reuters
 
 
 
-def train_bernoulli(train_set,categories,vocabulary):
-    numdocs=len(train_set)
+def train_bernoulli(numdocs,doc_in_class,words_in_class,categories,vocabulary):
     prior=dict()
     condprob=dict()
     
     for c in categories:
-        doc_in_class=sorted(list(doc for doc in train_set if doc in reuters.fileids(c)))
-        numdocsinclass=len(doc_in_class)
+        docs=doc_in_class[c]
+        numdocsinclass=len(docs)
         print(numdocsinclass)
         prior[c]=numdocsinclass/numdocs
-        
-        text=str()
-        for doc in doc_in_class:
-            text+=reuters.raw(doc)
-        words_in_class=sorted(manager.extractVocabulary(text))
-        print(len(words_in_class))
+        words=words_in_class[c]
+        print(len(words))
         
         for word in vocabulary:
-            if word in words_in_class:
-                occur=len([doc for doc in doc_in_class if word in words_in_class])
-                words_in_class.remove(word)
+            if word in words:
+                occur=len([doc for doc in doc_in_class if word in words])
+                #words_in_class.remove(word)
                 condprob[(word,c)]=(occur+1)/(numdocsinclass+2)
             else:
                 condprob[(word,c)]=1/(numdocsinclass+2)
@@ -39,19 +34,19 @@ def apply_bernoulli(vocabulary,categories,docs,prior,condprob,ytrue):
     num_predictions=0
     precision=list()
     recall=list()
+    score=dict()
     for doc in docs:
+        score.clear()
+        score=prior.copy()
+        score.update((x,log10(y)) for x,y in score.items())
         print("#### "+doc+ " ####")
         doc_voc=manager.extractVocabulary(reuters.raw(doc))
-        score=dict()
         for c in categories:
-            score[c]=log10(prior[c])
             for word in vocabulary:
-                if(word in doc_voc):
+                if word in doc_voc:
                     score[c]+=log10(condprob[(word,c)])
-                    doc_voc.remove(word)
                 else:
                     score[c]+=log10(1-condprob[(word,c)])
-                    
         print(score)
         
         prediction=max(score,key=score.get)

@@ -9,26 +9,36 @@ from multinomialNB import train_multinomial, apply_multinomial
 import numpy as np
 from sklearn.metrics import f1_score,precision_score,recall_score
 from nltk.metrics.scores import precision
-from perceptron import tf,idf
+from perceptron import tf,idf, train
+
+def plot_precision_recall_curve(precision,recall,break_even):
+    plt.plot(recall,precision,'blue')
+    plt.plot([0,break_even],[0,break_even],'red')
+    plt.xlabel('Recall')
+    plt.ylabel('Precision')
+    plt.ylim([0.0, 1.05])
+    plt.xlim([0.0, 0.7])
+    show()
+    
 
 def main():
     init()
-    categories=['earn','acq','crude','grain','money-fx','trade']
-    train_docs = [doc for c in categories for doc in reuters.fileids(c) if doc.startswith("train")]
+    categories=['acq','corn','crude','earn','grain','interest','money-fx','ship','trade','wheat']
+    train_docs = sorted([doc for c in categories for doc in reuters.fileids(c) if doc.startswith("train")])
     print(len(train_docs))
     test_docs = [doc for c in categories for doc in reuters.fileids(c) if doc.startswith("test")]
     print(len(test_docs))
     
+    doc_in_class={cat:list(doc for doc in train_docs if doc in reuters.fileids(cat)) for cat in categories}
+    print(doc_in_class)
+
+    vocabulary=sorted(extractVocabulary(reuters.raw(train_docs)+' '))
+    print(len(vocabulary))
     
-    text=""
-    for t in train_docs:
-        text+=reuters.raw(t)
-        
-    vocabulary=sorted(extractVocabulary(text))
-    
-    print(tf(train_docs))
-    print(idf(train_docs,vocabulary))
-    
+    words_in_class={cat:extractVocabulary(reuters.raw(doc_in_class[cat])+' ') for cat in categories}
+    print(words_in_class)
+            
+
     ytrue=defaultdict(list)
     for doc in test_docs:
         for c in categories:
@@ -37,24 +47,16 @@ def main():
                 
     
     #BERNOULLI
-    prior,condprob=train_bernoulli(train_docs, categories, vocabulary)
+    prior,condprob=train_bernoulli(len(train_docs),doc_in_class,words_in_class, categories, vocabulary)
     print(prior)
     print(condprob)
     
     print("Train ended")
     precision,recall, break_even=apply_bernoulli(vocabulary, categories, test_docs, prior, condprob, ytrue)
-    print(precision)
-    print(recall)
-    print(break_even)
+    plot_precision_recall_curve(precision, recall, break_even)
     print("Prediction ended")
     
-    plt.plot(recall,precision,'blue')
-    plt.plot([0,break_even],[0,break_even],'red')
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.ylim([0.0, 1.05])
-    plt.xlim([0.0, 0.7])
-    show()
+    
     
     #MULTINOMIAL    
     prior,condprob=train_multinomial(train_docs,categories,vocabulary)
@@ -64,18 +66,9 @@ def main():
     print("Train ended")
                 
     precision,recall, break_even=apply_multinomial(vocabulary, categories, test_docs, prior, condprob, ytrue)
-    print(precision)
-    print(recall)
-    print(break_even)
     print("Prediction ended")
     
-    plt.plot(recall,precision,'blue')
-    plt.plot([0,break_even],[0,break_even],'red')
-    plt.xlabel('Recall')
-    plt.ylabel('Precision')
-    plt.ylim([0.0, 1.05])
-    plt.xlim([0.0, 0.7])
-    show()
+    plot_precision_recall_curve(precision, recall, break_even)
                 
     '''
     ypredict=dict()
@@ -110,18 +103,6 @@ def main():
     print(recall)
     '''
     
-    
-    
-    '''
-    results=np.zeros(len(test_docs))
-    for d in test_docs:
-        cat=(cat for cat in categories if d in reuters.fileids(cat))
-        calcCat=apply_multinomial(d,categories, prior, condprob)
-        if(calcCat==cat):
-            np.insert(results, d, 1)
-            
-    print(results)
-    ''' 
 
 if __name__ == "__main__":
     main()

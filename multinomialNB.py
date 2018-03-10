@@ -6,9 +6,6 @@ from math  import log10
 from nltk.metrics.scores import precision
 from _collections import defaultdict
 
-def select_true_class(doc,ytrue):
-    return ytrue[doc]
-
 def train_multinomial(train_set,categories,vocabulary):
     numdocs=len(train_set)
     prior=dict()

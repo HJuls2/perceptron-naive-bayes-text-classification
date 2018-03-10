@@ -9,9 +9,8 @@ def tf(setDoc):
     tf={}
     for doc in setDoc:
         words=tokenize(reuters.raw(doc))
-        for w in words:
-            tf[(doc,w)]=words.count(w)/len(words)
-    return  tf
+        tf[doc]=dict((w, words.count(w)/len(words)) for w in words )
+    return tf
 
 def idf(setDoc,vocabulary):
     idf={}
@@ -22,7 +21,44 @@ def idf(setDoc,vocabulary):
     print(sorted(words))
     for word in vocabulary:
         idf[word]=math.log(len(setDoc)/ (1+words.count(word)))           
-    return idf            
+    return idf
+'''
+def tfidf(setDoc,vocabulary):
+    tfidf=dict()
+    words=list()
+    for doc in setDoc:
+        words_in_doc=tokenize(reuters.raw(doc))
+        words.extend(list(set(words_in_doc)))
+        for w in words_in_doc:
+            tfidf[(doc,w)]=words.count(w)/len(words_in_doc)
+        
+    
+    for word in vocabulary:
+        for doc in setDoc:
+            if (doc,word) in tfidf.keys():
+                tfidf[(doc,word)]*=math.log(len(setDoc)/(1+words.count(word)))
+            else:
+                tfidf[(doc,word)]=0.0
+    
+    
+    return  tfidf
+        
+''' 
+
+def tfidf(docs,vocabulary):
+    tf=tf(docs)
+    idf=idf(docs, vocabulary)
+    tf_idf=np.zeros(len(docs)*len(vocabulary)).reshape(len(docs),len(vocabulary))
+    
+    for doc in docs:
+        for word in vocabulary:
+            if word in tf[doc]:
+                tf_idf[docs.index(doc)][vocabulary.index(word)]=(tf[doc].get(word))*(idf[word])
+        print(tf_idf[docs.index(doc)])
+        
+    return tf_idf
+    
+    
         
             
 def train(train_docs,categories):
@@ -37,7 +73,7 @@ def train(train_docs,categories):
         docInClass[c]=list(doc for doc in train_docs if doc in reuters.fileids(c))
         allDocs.append(docInClass[c].copy())
         for doc in docInClass[c]:
-            words=words.union((manager.tokenize(reuters.raw(doc))))
+            words=words.union((tokenize(reuters.raw(doc))))
             
     
     words=list(words)
@@ -60,7 +96,7 @@ def train(train_docs,categories):
     
     for c in categories:
         for doc in range(0,len(docInClass[c])-1):
-            wordInDoc=manager.tokenize(reuters.raw(docInClass[c][doc]))
+            wordInDoc=tokenize(reuters.raw(docInClass[c][doc]))
             for word in words:
                 if word in wordInDoc:
                     occurs[words.index(word)]=wordInDoc.count(word)
