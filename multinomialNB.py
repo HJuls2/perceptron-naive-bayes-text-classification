@@ -6,19 +6,19 @@ from math  import log10
 from nltk.metrics.scores import precision
 from _collections import defaultdict
 
-def train_multinomial(train_set,categories,vocabulary):
+def train_multinomial(train_set,docs_in_class,vocabulary):
     numdocs=len(train_set)
     prior=dict()
     condprob=dict()
     occur = dict()
     text=""
-    for c in categories:
+    for c in docs_in_class.keys():
         cat_tokens=list()
-        doc_in_class=len(list(doc for doc in train_set if doc in reuters.fileids(c)))
-        prior[c] = doc_in_class/numdocs
+        num_docs_in_class=len(docs_in_class)
+        prior[c] = num_docs_in_class/numdocs
         
         text=' '.join(list(reuters.raw(doc) for doc in train_set if doc in reuters.fileids(c)))
-        cat_tokens=manager.tokenize(text)
+        cat_tokens=tuple(manager.tokenize(text))
         
         #cat_tokens.extend( manager.porterStemmer(reuters.words(doc)) for doc in reuters.fileids(c))
         print(cat_tokens)

@@ -1,5 +1,4 @@
 import nltk
-from nltk.corpus import  reuters
 from nltk import word_tokenize
 from nltk.stem.porter import PorterStemmer
 import re
@@ -13,7 +12,8 @@ def init():
 
 
 def extractVocabulary(text):
-    vocabulary = list(set(tokenize(text)))
+    #vocabulary = list(set(tokenize(text)))
+    vocabulary = set(tokenize(text))
     return vocabulary
 
 def porterStemmer(words):

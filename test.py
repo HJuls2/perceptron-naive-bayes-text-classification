@@ -23,19 +23,20 @@ def plot_precision_recall_curve(precision,recall,break_even):
 
 def main():
     init()
-    categories=['acq','corn','crude','earn','grain','interest','money-fx','ship','trade','wheat']
-    train_docs = sorted([doc for c in categories for doc in reuters.fileids(c) if doc.startswith("train")])
+    categories='acq','corn','crude','earn','grain','interest','money-fx','ship','trade','wheat'
+    train_docs = tuple(doc for c in categories for doc in reuters.fileids(c) if doc.startswith("train"))
     print(len(train_docs))
-    test_docs = [doc for c in categories for doc in reuters.fileids(c) if doc.startswith("test")]
+    test_docs = tuple(doc for c in categories for doc in reuters.fileids(c) if doc.startswith("test"))
     print(len(test_docs))
     
-    doc_in_class={cat:list(doc for doc in train_docs if doc in reuters.fileids(cat)) for cat in categories}
-    print(doc_in_class)
-
+    docs_in_class={cat:tuple(filter(lambda doc: doc in reuters.fileids(cat),train_docs)) for cat in categories}
+    #doc_in_class={cat:list(doc for doc in train_docs if doc in reuters.fileids(cat)) for cat in categories}
+    
+    
     vocabulary=sorted(extractVocabulary(reuters.raw(train_docs)+' '))
     print(len(vocabulary))
     
-    words_in_class={cat:extractVocabulary(reuters.raw(doc_in_class[cat])+' ') for cat in categories}
+    words_in_class={cat:extractVocabulary(reuters.raw(docs_in_class[cat])+' ') for cat in categories}
     print(words_in_class)
             
 
@@ -47,7 +48,7 @@ def main():
                 
     
     #BERNOULLI
-    prior,condprob=train_bernoulli(len(train_docs),doc_in_class,words_in_class, categories, vocabulary)
+    prior,condprob=train_bernoulli(len(train_docs),docs_in_class,words_in_class, vocabulary)
     print(prior)
     print(condprob)
     
@@ -59,7 +60,7 @@ def main():
     
     
     #MULTINOMIAL    
-    prior,condprob=train_multinomial(train_docs,categories,vocabulary)
+    prior,condprob=train_multinomial(train_docs,docs_in_class,vocabulary)
     print(prior)
     print(condprob)
     

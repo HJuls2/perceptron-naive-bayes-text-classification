@@ -5,30 +5,30 @@ from nltk.corpus import reuters
 
 
 
-def train_bernoulli(numdocs,doc_in_class,words_in_class,categories,vocabulary):
+def train_bernoulli(numdocs,docs_in_class,words_in_class,vocabulary):
     prior=dict()
     condprob=dict()
     
-    for c in categories:
-        docs=doc_in_class[c]
+    for c in docs_in_class.keys():
+        docs=docs_in_class[c]
         numdocsinclass=len(docs)
         print(numdocsinclass)
         prior[c]=numdocsinclass/numdocs
         words=words_in_class[c]
-        print(len(words))
         
         for word in vocabulary:
             if word in words:
-                occur=len([doc for doc in doc_in_class if word in words])
-                #words_in_class.remove(word)
+                occur=len([doc for doc in docs_in_class if word in words])
+                words.remove(word)
                 condprob[(word,c)]=(occur+1)/(numdocsinclass+2)
             else:
                 condprob[(word,c)]=1/(numdocsinclass+2)
             
     return prior,condprob
-
+    
 
 def apply_bernoulli(vocabulary,categories,docs,prior,condprob,ytrue):
+    
     break_even=0
     corrects=list()
     num_predictions=0
@@ -36,7 +36,7 @@ def apply_bernoulli(vocabulary,categories,docs,prior,condprob,ytrue):
     recall=list()
     score=dict()
     for doc in docs:
-        score.clear()
+        #score.clear()
         score=prior.copy()
         score.update((x,log10(y)) for x,y in score.items())
         print("#### "+doc+ " ####")
