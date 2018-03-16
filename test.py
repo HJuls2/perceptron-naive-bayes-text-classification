@@ -9,7 +9,7 @@ from multinomialNB import train_multinomial, apply_multinomial
 import numpy as np
 from sklearn.metrics import f1_score,precision_score,recall_score
 from nltk.metrics.scores import precision
-from perceptron import tf,idf, train
+import perceptron as perc
 
 def plot_precision_recall_curve(precision,recall,break_even):
     plt.plot(recall,precision,'blue')
@@ -45,6 +45,12 @@ def main():
         for c in categories:
             if doc in reuters.fileids(c):
                 ytrue[doc].append(c)
+                
+    
+    #PERCEPTRON
+    weights,bias=perc.train(train_docs, docs_in_class, vocabulary)
+    print (weights)
+    print (bias)
                 
     
     #BERNOULLI

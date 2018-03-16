@@ -46,57 +46,53 @@ def tfidf(setDoc,vocabulary):
 ''' 
 
 def tfidf(docs,vocabulary):
-    tf=tf(docs)
-    idf=idf(docs, vocabulary)
-    tf_idf=np.zeros(len(docs)*len(vocabulary)).reshape(len(docs),len(vocabulary))
+    tfi=tf(docs)
+    idfi=idf(docs, vocabulary)
+    tf_idf={doc:np.zeros(len(vocabulary)) for doc in docs}
     
     for doc in docs:
         for word in vocabulary:
-            if word in tf[doc]:
-                tf_idf[docs.index(doc)][vocabulary.index(word)]=(tf[doc].get(word))*(idf[word])
-        print(tf_idf[docs.index(doc)])
+            if word in tfi[doc]:
+                tf_idf[doc][vocabulary.index(word)]=(tfi[doc].get(word))*(idfi[word])
+        print(tf_idf[doc])
         
     return tf_idf
     
     
-        
-            
-def train(train_docs,categories):
-    docInClass = dict()
+'''        
+def train(train_docs,docs_in_class):
     allDocs=list()
     y=dict()
     k=dict()
 
     words=set()
     
-    for c in categories:
-        docInClass[c]=list(doc for doc in train_docs if doc in reuters.fileids(c))
-        allDocs.append(docInClass[c].copy())
-        for doc in docInClass[c]:
+    for c in docs_in_class.keys():
+        allDocs.append(docs_in_class[c].copy())
+        for doc in docs_in_class[c]:
             words=words.union((tokenize(reuters.raw(doc))))
             
     
     words=list(words)
     print(allDocs)
-    #allDocs=random.shuffle(allDocs)
     
     weights=dict()
-    for c in categories:
+    for c in docs_in_class.keys():
         weights[c]=np.zeros(len(words))
     
     
     occurs=np.zeros(len(words))
     bias=np.zeros(len(words))
     length=0
-    for c in categories:
-        length=length+len(docInClass[c])
+    for c in docs_in_class.keys():
+        length+=len(docs_in_class[c])
         
     r=np.zeros(length)
     x=dict()
     
-    for c in categories:
-        for doc in range(0,len(docInClass[c])-1):
-            wordInDoc=tokenize(reuters.raw(docInClass[c][doc]))
+    for c in docs_in_class.keys():
+        for doc in range(0,len(docs_in_class[c])-1):
+            wordInDoc=tokenize(reuters.raw(docs_in_class[c][doc]))
             for word in words:
                 if word in wordInDoc:
                     occurs[words.index(word)]=wordInDoc.count(word)
@@ -108,7 +104,7 @@ def train(train_docs,categories):
     
     
     
-    for c in categories:
+    for c in docs_in_class.keys():
         for doc in allDocs:
             if(np.dot(weights[c],x[doc])<=0):
                 y[doc,c]=-1
@@ -119,7 +115,33 @@ def train(train_docs,categories):
         
     
     print(weights)
+'''   
+
+def train(train_docs,docs_in_class,vocabulary):
+    sorted(train_docs)
+    x=tfidf(train_docs, vocabulary)
+    weights,bias={doc:np.zeros(len(vocabulary)) for doc in train_docs}
+    errors=0
+    pos=0
+    while errors==0 and pos<len(train_docs):
+        #doc=next(iter(train_docs))
+        doc=train_docs[pos]
+        if doc in docs_in_class:
+            y=1
+        else:
+            y=-1
+        
+        if y*np.dot(weights[doc],x[doc]+bias[doc])<=0:
+            weights[doc]+=y*x[doc]
+            bias[train_docs.index(doc)]+=y
+            errors+=1
     
+    return weights,bias  
             
+            
+        
+    
+    
+       
 
         
