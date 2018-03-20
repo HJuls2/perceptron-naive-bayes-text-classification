@@ -18,7 +18,6 @@ def idf(setDoc,vocabulary):
     for doc in setDoc:
         word_in_doc=extractVocabulary(reuters.raw(doc))
         words.extend(word_in_doc)
-    print(sorted(words))
     for word in vocabulary:
         idf[word]=math.log(len(setDoc)/ (1+words.count(word)))           
     return idf
@@ -54,7 +53,6 @@ def tfidf(docs,vocabulary):
         for word in vocabulary:
             if word in tfi[doc]:
                 tf_idf[doc][vocabulary.index(word)]=(tfi[doc].get(word))*(idfi[word])
-        print(tf_idf[doc])
         
     return tf_idf
     
@@ -117,24 +115,26 @@ def train(train_docs,docs_in_class):
     print(weights)
 '''   
 
-def train(train_docs,docs_in_class,vocabulary):
+def train(train_docs,weights,bias,docs_in_class,vocabulary):
     sorted(train_docs)
     x=tfidf(train_docs, vocabulary)
-    weights,bias={doc:np.zeros(len(vocabulary)) for doc in train_docs}
+    r=np.max([np.linalg.norm(x[doc]) for doc in train_docs])
     errors=0
-    pos=0
-    while errors==0 and pos<len(train_docs):
-        #doc=next(iter(train_docs))
-        doc=train_docs[pos]
-        if doc in docs_in_class:
-            y=1
-        else:
-            y=-1
-        
-        if y*np.dot(weights[doc],x[doc]+bias[doc])<=0:
-            weights[doc]+=y*x[doc]
-            bias[train_docs.index(doc)]+=y
-            errors+=1
+    epoch_err=0
+    while epoch_err==0:
+        for doc in train_docs:
+            if doc in docs_in_class:
+                y=1
+            else:
+                y=-1
+            
+            if y*np.dot(weights,x[doc]+bias)<=0:
+                weights+=y*x[doc]
+                bias+=y*r**2
+                print(weights)
+                print(bias)
+                epoch_err+=1
+                errors+=1
     
     return weights,bias  
             

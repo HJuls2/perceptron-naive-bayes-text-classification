@@ -48,10 +48,12 @@ def main():
                 
     
     #PERCEPTRON
-    weights,bias=perc.train(train_docs, docs_in_class, vocabulary)
-    print (weights)
-    print (bias)
-                
+    
+    for cat in categories:
+        weights=bias=np.zeros(len(vocabulary))
+        weights,bias=perc.train(train_docs,weights,bias, docs_in_class[cat], vocabulary)
+    #print (weights)
+    #print (bias) 
     
     #BERNOULLI
     prior,condprob=train_bernoulli(len(train_docs),docs_in_class,words_in_class, vocabulary)
@@ -59,7 +61,7 @@ def main():
     print(condprob)
     
     print("Train ended")
-    precision,recall, break_even=apply_bernoulli(vocabulary, categories, test_docs, prior, condprob, ytrue)
+    precision,recall,f1,break_even=apply_bernoulli(vocabulary, categories, test_docs, prior, condprob, ytrue)
     plot_precision_recall_curve(precision, recall, break_even)
     print("Prediction ended")
     
@@ -72,7 +74,7 @@ def main():
     
     print("Train ended")
                 
-    precision,recall, break_even=apply_multinomial(vocabulary, categories, test_docs, prior, condprob, ytrue)
+    precision,recall,f1,break_even=apply_multinomial(vocabulary, categories, test_docs, prior, condprob, ytrue)
     print("Prediction ended")
     
     plot_precision_recall_curve(precision, recall, break_even)

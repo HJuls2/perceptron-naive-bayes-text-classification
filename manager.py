@@ -3,14 +3,31 @@ from nltk import word_tokenize
 from nltk.stem.porter import PorterStemmer
 import re
 from nltk.corpus import stopwords
+from functools import singledispatch
+from _io import open
+import string
 
 def init():
     nltk.download('reuters')
     nltk.download('stopwords')
     nltk.download('punkt')
+''''
+@singledispatch
+def writeToCSV(data,destination):
+    csv=open(destination,"w")
     
 
+@writeToCSV.register(tuple or list)
+def _(data,destination):
+    csv=open(destination,"w")
+    row=""
+    for d in data:
+        row.append(d+",")
+    
+    csv.write(row)
 
+'''
+    
 def extractVocabulary(text):
     #vocabulary = list(set(tokenize(text)))
     vocabulary = set(tokenize(text))

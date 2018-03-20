@@ -39,6 +39,7 @@ def apply_multinomial(vocabulary,categories,docs,prior,condprob,ytrue):
     num_predictions=0
     precision=list()
     recall=list()
+    f1=list()
     for doc in docs:
         score=dict()
         doc_tokens=manager.tokenize(reuters.raw(doc))
@@ -62,13 +63,15 @@ def apply_multinomial(vocabulary,categories,docs,prior,condprob,ytrue):
             
         precision.append(len(corrects)/(num_predictions+1))
         recall.append(len(corrects)/len(docs))
+        if precision[-1]!=0 or recall[-1]!=0:
+            f1.append(2*((precision[-1]*recall[-1])/(precision[-1]+recall[-1])))
         
         if(precision[num_predictions]==recall[num_predictions]):
             break_even=precision[num_predictions]
         
         num_predictions+=1
         
-    return precision,recall,break_even
+    return precision,recall,f1,break_even
         
             
         
