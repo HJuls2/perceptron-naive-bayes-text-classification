@@ -115,10 +115,9 @@ def train(train_docs,docs_in_class):
     print(weights)
 '''   
 
-def train(train_docs,weights,bias,docs_in_class,vocabulary):
+def train(train_docs,x,r,docs_in_class,vocabulary):
+    weights=bias=np.zeros(len(vocabulary))
     sorted(train_docs)
-    x=tfidf(train_docs, vocabulary)
-    r=np.max([np.linalg.norm(x[doc]) for doc in train_docs])
     errors=0
     epoch_err=0
     while epoch_err==0:
@@ -130,14 +129,17 @@ def train(train_docs,weights,bias,docs_in_class,vocabulary):
             
             if y*np.dot(weights,x[doc]+bias)<=0:
                 weights+=y*x[doc]
-                bias+=y*r**2
-                print(weights)
-                print(bias)
+                for b in bias:
+                    b+=y*r**2
                 epoch_err+=1
                 errors+=1
     
     return weights,bias  
-            
+
+
+def test(doc,x,y,label,weight, bias):
+    if 
+    if y*np.dot(weight,x+bias)<=0:
             
         
     
