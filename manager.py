@@ -3,30 +3,35 @@ from nltk import word_tokenize
 from nltk.stem.porter import PorterStemmer
 import re
 from nltk.corpus import stopwords
-from functools import singledispatch
-from _io import open
-import string
+import numpy as np
+from nltk.corpus import reuters
+
 
 def init():
     nltk.download('reuters')
     nltk.download('stopwords')
     nltk.download('punkt')
-''''
-@singledispatch
-def writeToCSV(data,destination):
-    csv=open(destination,"w")
+    categories='acq','corn','crude','earn','grain','interest','money-fx','ship','trade','wheat'
+    train_docs = sorted(set(doc for c in categories for doc in reuters.fileids(c) if doc.startswith("train")))
+    test_docs = sorted(set(doc for c in categories for doc in reuters.fileids(c) if doc.startswith("test")))
+    docs_in_class={cat:set(filter(lambda doc: doc in reuters.fileids(cat),train_docs)) for cat in categories}
+    test_docs_in_class={cat:set(filter(lambda doc:doc in reuters.fileids(cat),test_docs)) for cat in categories}
+    vocabulary=sorted(extractVocabulary(reuters.raw(train_docs)+' '))
+    words_in_class={cat:extractVocabulary(reuters.raw(docs_in_class[cat])+' ') for cat in categories}
+    y_true=np.array([categories.index(doc[0]) for doc in test_docs_in_class.items()])
+    #y_true_by_class={cat:np.zeros(len(test_docs)) for cat in categories}
+    y_true_by_class=dict()
     
+    for cat in categories:
+        y_true_by_class[cat]=np.zeros(len(test_docs))
+        for doc in test_docs:
+            if doc in reuters.fileids(cat):
+                y_true_by_class[cat][test_docs.index(doc)]=1
+                
+    return categories,train_docs,test_docs,docs_in_class,vocabulary,words_in_class,y_true,y_true_by_class
+                
+                
 
-@writeToCSV.register(tuple or list)
-def _(data,destination):
-    csv=open(destination,"w")
-    row=""
-    for d in data:
-        row.append(d+",")
-    
-    csv.write(row)
-
-'''
     
 def extractVocabulary(text):
     #vocabulary = list(set(tokenize(text)))

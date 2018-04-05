@@ -3,147 +3,112 @@ import numpy as np
 from nltk.corpus import reuters
 from _collections import defaultdict
 import math
+from numpy import float64
+from scipy.sparse.bsr import bsr_matrix
+from nltk.metrics.scores import recall
 
 
-def tf(setDoc):
+def tf(docs):
     tf={}
-    for doc in setDoc:
+    for doc in docs:
         words=tokenize(reuters.raw(doc))
-        tf[doc]=dict((w, words.count(w)/len(words)) for w in words )
+        doc_voc=set(words)
+        for w in doc_voc:
+            tf[(doc,w)]=words.count(w)/len(words)
     return tf
 
-def idf(setDoc,vocabulary):
-    idf={}
+def idf(docs,sorted_voc):
+    idf=np.zeros(len(sorted_voc))
     words=list()
-    for doc in setDoc:
+    for doc in docs:
         word_in_doc=extractVocabulary(reuters.raw(doc))
         words.extend(word_in_doc)
-    for word in vocabulary:
-        idf[word]=math.log(len(setDoc)/ (1+words.count(word)))           
+    for word in sorted_voc:
+        idf[sorted_voc.index(word)]=math.log(len(docs))-math.log(1+words.count(word))           
     return idf
-'''
-def tfidf(setDoc,vocabulary):
-    tfidf=dict()
-    words=list()
-    for doc in setDoc:
-        words_in_doc=tokenize(reuters.raw(doc))
-        words.extend(list(set(words_in_doc)))
-        for w in words_in_doc:
-            tfidf[(doc,w)]=words.count(w)/len(words_in_doc)
-        
-    
+
+
+def tfidf(tf,idf,doc, vocabulary):
+    tfidf=np.zeros(len(vocabulary))
     for word in vocabulary:
-        for doc in setDoc:
-            if (doc,word) in tfidf.keys():
-                tfidf[(doc,word)]*=math.log(len(setDoc)/(1+words.count(word)))
-            else:
-                tfidf[(doc,word)]=0.0
+        if tf.get((doc,word),0)!= 0:
+            tfidf[vocabulary.index(word)]=tf.get((doc,word))*idf[vocabulary.index(word)]
+    return tfidf
     
-    
-    return  tfidf
-        
-''' 
+def calc_r(train_docs,vocabulary,tf,idf):
+    return max([np.linalg.norm(tfidf(tf,idf,doc,vocabulary)) for doc in train_docs])
 
-def tfidf(docs,vocabulary):
-    tfi=tf(docs)
-    idfi=idf(docs, vocabulary)
-    tf_idf={doc:np.zeros(len(vocabulary)) for doc in docs}
-    
-    for doc in docs:
-        for word in vocabulary:
-            if word in tfi[doc]:
-                tf_idf[doc][vocabulary.index(word)]=(tfi[doc].get(word))*(idfi[word])
-        
-    return tf_idf
-    
-    
-'''        
-def train(train_docs,docs_in_class):
-    allDocs=list()
-    y=dict()
-    k=dict()
-
-    words=set()
-    
-    for c in docs_in_class.keys():
-        allDocs.append(docs_in_class[c].copy())
-        for doc in docs_in_class[c]:
-            words=words.union((tokenize(reuters.raw(doc))))
-            
-    
-    words=list(words)
-    print(allDocs)
-    
-    weights=dict()
-    for c in docs_in_class.keys():
-        weights[c]=np.zeros(len(words))
-    
-    
-    occurs=np.zeros(len(words))
-    bias=np.zeros(len(words))
-    length=0
-    for c in docs_in_class.keys():
-        length+=len(docs_in_class[c])
-        
-    r=np.zeros(length)
-    x=dict()
-    
-    for c in docs_in_class.keys():
-        for doc in range(0,len(docs_in_class[c])-1):
-            wordInDoc=tokenize(reuters.raw(docs_in_class[c][doc]))
-            for word in words:
-                if word in wordInDoc:
-                    occurs[words.index(word)]=wordInDoc.count(word)
-            
-            x[doc]=occurs
-            r[doc]=np.linalg.norm(x[doc])     
-    
-    r = np.max(r)
-    
-    
-    
-    for c in docs_in_class.keys():
-        for doc in allDocs:
-            if(np.dot(weights[c],x[doc])<=0):
-                y[doc,c]=-1
-                weights[c]=weights[c]+(np.dot(y[doc,c],x[doc]))
-                k[c]=k[c]+1
-            else:
-                y[doc,c]=1
-        
-    
-    print(weights)
-'''   
-
-def train(train_docs,x,r,docs_in_class,vocabulary):
-    weights=bias=np.zeros(len(vocabulary))
-    sorted(train_docs)
-    errors=0
-    epoch_err=0
-    while epoch_err==0:
+def train(train_docs,rquad,tf,idf,docs_in_class,vocabulary,max_iter):
+    weights=np.zeros(len(vocabulary))
+    bias=0
+    epochs=0
+    finish=False
+    while not finish and epochs < max_iter:
+        error=0
         for doc in train_docs:
+            x=tfidf(tf,idf,doc,vocabulary)
             if doc in docs_in_class:
                 y=1
             else:
                 y=-1
+                
+            if y*(np.dot(weights,x)+bias)<= 0:
+                weights=np.add(weights,np.dot(x,y))
+                bias+=y*rquad
+                error+=1
+                
+        if error==0:
+            finish=True
             
-            if y*np.dot(weights,x[doc]+bias)<=0:
-                weights+=y*x[doc]
-                for b in bias:
-                    b+=y*r**2
-                epoch_err+=1
-                errors+=1
+        epochs+=1
+
     
-    return weights,bias  
+    return weights,bias,epochs
 
 
-def test(doc,x,y,label,weight, bias):
-    if 
-    if y*np.dot(weight,x+bias)<=0:
-            
-        
-    
-    
-       
+def test(docs,weights,bias,tf,idf,vocabulary):
+    results=np.zeros(len(docs))
+    scores=[]
+    for d in docs:
+        scores.append(docs.index(d),np.dot(weights,tfidf(tf,idf,d, vocabulary))+bias)
+        if scores[docs.index(d)] > 0:
+            results[docs.index(d)]=1
+    return results,scores
 
-        
+def recall_precision_curve(y_true,scores):
+    scores=sorted(scores,key=lambda x:x[1],reverse=True)
+    
+    tps=fps=fns=np.zeros(y_true.size)
+    
+    for i in range(0,y_true.size-1):
+        if scores[i][1] > 0:
+            if y_true[scores[i][0]] == 1:
+                if i != 0:
+                    tps[i]=tps[i-1]+1
+                else:
+                    tps[0]+=1
+            else:
+                if i !=0:
+                    fps[i]=fps[i-1]+1
+                else:
+                    fps[0]+=1
+        else:
+            if y_true[scores[i][0]] == 1:
+                if i != 0:
+                    fns[i]=fns[i-1]+1
+                else:
+                    fns[0]+=1
+    
+    recall=np.array([tps[i]/(tps[i]+fns[i]) for i in range(0,y_true.size -1)])
+    precision=np.array(tps[i]/(tps[i]+fps[i] for i in range(0,y_true.size -1)))
+    
+    i=0
+    while recall[i] != precision[i]:
+        break_even=recall[i]
+    
+    return recall,precision,break_even
+                
+    
+    
+    
+   
