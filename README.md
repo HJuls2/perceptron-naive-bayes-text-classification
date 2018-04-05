@@ -12,6 +12,7 @@ So,the categories considered are :
 * ship
 * trade
 * wheat
+
 The implemented and analyzed alghoritms are  :
 * Bernoulli Naive Bayes
 * Multinomial Naive Bayes
