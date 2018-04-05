@@ -21,11 +21,11 @@ The implemented and analyzed alghoritms are  :
 ## Requirements
 
 The exercise needs the following installed modules:
-*SciPy
-*NumPy
-*NLTK    https://www.nltk.org/
-*Scikit-Learn http://scikit-learn.org/stable/
-*MatPlotLib
+* SciPy
+* NumPy
+* NLTK    https://www.nltk.org/
+* Scikit-Learn http://scikit-learn.org/stable/
+* MatPlotLib
 
 ## Instructions
 Launching the main.py script the program executes training and testing (in the order) for Percetron, Bernoulli Naive Bayes and Multinomila Naive Bayes.
