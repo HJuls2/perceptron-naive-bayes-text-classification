@@ -30,7 +30,7 @@ def train_bernoulli(numdocs,docs_in_class,words_in_class,vocabulary):
     
 
 def apply_bernoulli(vocabulary,categories,docs,prior,condprob):
-    predictions=np.empty(len(docs))
+    predictions=np.zeros(len(docs))
     scores_by_category={cat:np.zeros(len(docs)) for cat in categories}
     score=dict()
     for doc in docs:

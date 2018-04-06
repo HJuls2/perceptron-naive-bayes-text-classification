@@ -2,6 +2,7 @@
 import manager
 from nltk.corpus import reuters
 from math  import log10
+import numpy as np
 
 from nltk.metrics.scores import precision
 from _collections import defaultdict
@@ -31,28 +32,34 @@ def train_multinomial(train_set,docs_in_class,vocabulary):
     return prior, condprob
 
 
-def apply_multinomial(vocabulary,categories,docs,prior,condprob,ytrue):
+def apply_multinomial(vocabulary,categories,docs,prior,condprob):
     #thresholds=[0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0]
     #predicted_by_class=defaultdict(list)
-    break_even=0
+    '''break_even=0
     corrects=list()
     num_predictions=0
     precision=list()
     recall=list()
     f1=list()
+    '''
+    predictions=np.zeros(len(docs))
+    scores_by_category={cat:np.zeros(len(docs)) for cat in categories}
+    score=dict()
     for doc in docs:
-        score=dict()
+        score=prior.copy()
+        score.update((x,np.log10(y)) for x,y in score.items())
         doc_tokens=manager.tokenize(reuters.raw(doc))
         
         for c in categories:
-            score[c]=log10(prior[c])
             for word in doc_tokens:
                 if word  in vocabulary:
                     score[c]+=log10(condprob[(word,c)])
                     
+            scores_by_category[c][docs.index(doc)]=np.power(score[c],10)
+                    
         
-        prediction=max(score,key=score.get)
-        
+        predictions[docs.index(doc)]=categories.index(max(score,key=score.get))
+        '''
         #Assign document to a class
         #predicted_by_class[prediction].append(doc)
         
@@ -70,8 +77,9 @@ def apply_multinomial(vocabulary,categories,docs,prior,condprob,ytrue):
             break_even=precision[num_predictions]
         
         num_predictions+=1
+        '''
         
-    return precision,recall,f1,break_even
+    return predictions,scores_by_category
         
             
         
