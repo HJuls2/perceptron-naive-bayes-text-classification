@@ -31,7 +31,7 @@ def train_bernoulli(numdocs,docs_in_class,words_in_class,vocabulary):
 
 def apply_bernoulli(vocabulary,categories,docs,prior,condprob):
     predictions=np.empty(len(docs))
-    scores=dict()
+    scores_by_category={cat:np.zeros(len(docs)) for cat in categories}
     score=dict()
     for doc in docs:
         score=prior.copy()
@@ -43,11 +43,11 @@ def apply_bernoulli(vocabulary,categories,docs,prior,condprob):
                     score[c]+=np.log10(condprob[(word,c)])
                 else:
                     score[c]+=np.log10(1-condprob[(word,c)])
-        
+                    
+            scores_by_category[c][docs.index(doc)]=np.power(score[c],10)
         
         predictions[docs.index(doc)]=categories.index(max(score,key=score.get))
-        scores[doc]=[s[1] for s in score.items()]
         
-    return predictions,scores
+    return predictions,scores_by_category
         
        
