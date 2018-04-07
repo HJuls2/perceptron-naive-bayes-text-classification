@@ -47,14 +47,3 @@ def apply_bernoulli(vocabulary,categories,docs,prior,condprob):
         predictions[docs.index(doc)]=categories.index(max(score,key=score.get))
 
     return predictions,scores_by_category
-
-
-              if word in doc_voc:
-                  score[c]+=np.log10(condprob[(word,c)])
-              else:
-                  score[c]+=np.log10(1-condprob[(word,c)])
-
-          scores_by_category[c][docs.index(doc)]=np.power(score[c],10)
-      predictions[docs.index(doc)]=categories.index(max(score,key=score.get))
-
-  return predictions,scores_by_category
