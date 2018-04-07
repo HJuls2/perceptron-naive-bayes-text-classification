@@ -30,6 +30,7 @@ def train_bernoulli(numdocs,docs_in_class,words_in_class,vocabulary):
 
 
 def apply_bernoulli(vocabulary,categories,docs,prior,condprob):
+<<<<<<< HEAD
   predictions=dict()
   score=dict()
   scores_by_category={cat:np.zeros(len(docs)) for cat in categories}
@@ -51,3 +52,23 @@ def apply_bernoulli(vocabulary,categories,docs,prior,condprob):
       predictions[docs.index(doc)]=categories.index(max(score,key=score.get))
 
   return predictions,scores_by_category
+=======
+    predictions=dict()
+    score=dict()
+    print(len(docs))
+    for doc in docs:
+        #score.clear()
+        score=prior.copy()
+        score.update((x,np.log10(y)) for x,y in score.items())
+        doc_voc=manager.extractVocabulary(reuters.raw(doc))
+        for c in categories:
+            for word in vocabulary:
+                if word in doc_voc:
+                    score[c]+=np.log10(condprob[(word,c)])
+                else:
+                    score[c]+=np.log10(1-condprob[(word,c)])
+
+        predictions[doc]=[s[1] for s in score.items()] # Contiene tutti gli score
+
+    return predictions
+>>>>>>> 252d533a1f41e203657f9f17901aafbfa344f02c
