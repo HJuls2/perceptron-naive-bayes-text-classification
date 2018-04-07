@@ -21,6 +21,8 @@ The implemented and analyzed alghoritms are  :
 
 ## Requirements
 
+On first start the program needs a working Internet connection to download dataset and others files; the following times it won't be needed.
+
 The exercise needs the following installed modules:
 * SciPy
 * NumPy
@@ -39,5 +41,5 @@ Dataset loading, vocabulary extraction and stemming process are heavily inspired
 ## Third libraries and modules
 
 * NLTK library : for loading the ModApte split of Reuters-21578 dataset, deleting stopwords, Porter's stemming process
-* Scikit-learn : to calculate precision-recall curves, f1 measure for Bernoulli and Multinomial Naive Bayes
+* Scikit-learn : to calculate metrics ( precision-recall curves, f1 measure, break-even point)
 * NumPy : vector operations 
