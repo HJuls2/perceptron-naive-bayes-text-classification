@@ -30,7 +30,6 @@ def apply_bernoulli(vocabulary,categories,docs,prior,condprob):
     predictions=dict()
     score=dict()
     scores_by_category={cat:np.zeros(len(docs)) for cat in categories}
-    print(len(docs))
     for doc in docs:
         #score.clear()
         score=prior.copy()

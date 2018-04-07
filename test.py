@@ -15,7 +15,7 @@ def calc_metrics(categories,y_true,y_true_by_class,y_preds,scores):
     for cat in categories:
         precision,recall,_=precision_recall_curve(y_true_by_class[cat],scores[cat])
         plot_precision_recall_curve(precision, recall)
-    print(f1_score(y_true,y_pred,average=None))
+    print(f1_score(y_true,y_preds,average=None))
 
 
 def plot_precision_recall_curve(precision,recall,break_even=0):
@@ -25,18 +25,20 @@ def plot_precision_recall_curve(precision,recall,break_even=0):
     plt.ylabel('Precision')
     plt.ylim([0.0, 1.05])
     plt.xlim([0.0, 1.05])
+    plt.show()
 
 
 def main():
-    categories,train_docs,test_docs,docs_in_class,vocabulary,words_in_class,y_true,y_true_by_class=init()
-
     print("Choose algorithm to run")
     launch=input("Type 'p' for perceptron, 'b' for BNB, 'm' for MNB, 'a' to run all the algorithms")
+    categories,train_docs,test_docs,docs_in_class,vocabulary,words_in_class,y_true,y_true_by_class=init()
 
     if launch== 'a' or launch=='p':
 
         #PERCEPTRON
-        weights=bias=epochs=dict()
+        weights=dict()
+        bias=dict()
+        epochs=dict()
         tfi=perc.tf(train_docs)
         idfi=perc.idf(train_docs, vocabulary)
         r=perc.calc_r(train_docs, vocabulary, tfi, idfi)
@@ -48,17 +50,20 @@ def main():
 
             print ("Weights of category ", cat," are : ",weights[cat])
             print ("Bias for category ",cat, " is : ",bias[cat])
-            print("Structure leanerd in ",epochs[cat]," epochs")
+            print("Structure learned in ",epochs[cat]," epochs")
 
         print("Perceptron training ended")
-
+        scores=dict()
         results=dict()
+        corr_scores=dict()
         for cat in categories:
-            results[cat]=perc.test(train_docs, weights[cat], bias[cat], tfi, idfi, vocabulary)
-            print(results[cat])
-
-
+            results[cat],scores[cat]=perc.test(test_docs, weights[cat], bias[cat], tfi, idfi, vocabulary)
+            corr_scores[cat]=perc.pr_curve(scores[cat])
+        
+        calc_metrics(categories, y_true, y_true_by_class, results, corr_scores)
+        
         print("Perceptron testing ended")
+
 
     if launch=='a' or launch=='b':
         #BERNOULLI
@@ -86,10 +91,10 @@ def main():
 
         print("Multinomial naive Bayes training ended")
 
-        precision,recall,f1,break_even=apply_multinomial(vocabulary, categories, test_docs, prior, condprob, ytrue)
+        predictions,scores=apply_multinomial(vocabulary, categories, test_docs, prior, condprob)
+        calc_metrics(categories, y_true,y_true_by_class, predictions, scores)
         print("MNB prediction ended")
 
-        plot_precision_recall_curve(precision, recall, break_even)
 
 
 

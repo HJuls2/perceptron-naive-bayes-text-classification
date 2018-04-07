@@ -67,48 +67,29 @@ def train(train_docs,rquad,tf,idf,docs_in_class,vocabulary,max_iter):
 
 
 def test(docs,weights,bias,tf,idf,vocabulary):
-    results=np.zeros(len(docs))
-    scores=[]
+    results=scores=np.zeros(len(docs))
     for d in docs:
-        scores.append(docs.index(d),np.dot(weights,tfidf(tf,idf,d, vocabulary))+bias)
+        np.put(scores,docs.index(d),np.dot(weights,tfidf(tf,idf,d, vocabulary))+bias,'raise')
         if scores[docs.index(d)] > 0:
-            results[docs.index(d)]=1
+            np.put(results,docs.index(d),1,'raise')
     return results,scores
 
-def recall_precision_curve(y_true,scores):
-    scores=sorted(scores,key=lambda x:x[1],reverse=True)
+def pr_curve(scores):
+    #np.sort(scores)
+    for i in range(0,len(scores)):
+        print(scores[i])
+        
+    minn=abs(np.amin(scores))
+    trasl=np.array([s+minn for s in scores])
+    maxx=np.amax(trasl)
+    print(trasl)
+    #probPer=np.zeros(len(trasl))
+    probPer=np.array([t/maxx for t in trasl])
     
-    tps=fps=fns=np.zeros(y_true.size)
-    
-    for i in range(0,y_true.size-1):
-        if scores[i][1] > 0:
-            if y_true[scores[i][0]] == 1:
-                if i != 0:
-                    tps[i]=tps[i-1]+1
-                else:
-                    tps[0]+=1
-            else:
-                if i !=0:
-                    fps[i]=fps[i-1]+1
-                else:
-                    fps[0]+=1
-        else:
-            if y_true[scores[i][0]] == 1:
-                if i != 0:
-                    fns[i]=fns[i-1]+1
-                else:
-                    fns[0]+=1
-    
-    recall=np.array([tps[i]/(tps[i]+fns[i]) for i in range(0,y_true.size -1)])
-    precision=np.array(tps[i]/(tps[i]+fps[i] for i in range(0,y_true.size -1)))
-    
-    i=0
-    while recall[i] != precision[i]:
-        break_even=recall[i]
-    
-    return recall,precision,break_even
+        
+    return probPer
                 
-    
+
     
     
    
