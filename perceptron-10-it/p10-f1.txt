@@ -1,0 +1,10 @@
+acq: 0.0
+corn: 0.0
+crude: 0.0
+earn: 0.0
+grain: 0.0
+interest: 0.09790732
+money-fx: 0.0
+ship: 0.0         
+trade: 0.0
+wheat: ???        
