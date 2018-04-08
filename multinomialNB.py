@@ -33,7 +33,7 @@ def train_multinomial(train_set,docs_in_class,vocabulary):
 
 
 def apply_multinomial(vocabulary,categories,docs,prior,condprob):
-    predictions=np.zeros(len(docs))
+    predictions=np.zeros(len(docs),dtype=np.int8)
     scores_by_category={cat:np.zeros(len(docs)) for cat in categories}
     score=dict()
     for doc in docs:
@@ -48,5 +48,6 @@ def apply_multinomial(vocabulary,categories,docs,prior,condprob):
                 scores_by_category[c][docs.index(doc)]=np.power(score[c],10)
 
 
-        predictions[docs.index(doc)]=categories.index(max(score,key=score.get))
+        np.put(predictions, docs.index(doc),categories.index(max(score,key=score.get)), 'raise')
+    
     return predictions,scores_by_category

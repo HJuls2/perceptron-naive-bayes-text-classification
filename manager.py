@@ -18,21 +18,41 @@ def init():
     test_docs_in_class={cat:set(filter(lambda doc:doc in reuters.fileids(cat),test_docs)) for cat in categories}
     vocabulary=sorted(extractVocabulary(reuters.raw(train_docs)+' '))
     words_in_class={cat:extractVocabulary(reuters.raw(docs_in_class[cat])+' ') for cat in categories}
-    y_true=np.array([categories.index(doc[0]) for doc in test_docs_in_class.items()])
-    #y_true_by_class={cat:np.zeros(len(test_docs)) for cat in categories}
-    y_true_by_class=dict()
+    y_true=np.zeros(len(test_docs),dtype=np.int8)
+    for doc in test_docs:
+        found=False
+        i=0
+        while not found and i<len(categories):
+            if doc in test_docs_in_class[categories[i]]:
+                np.put(y_true,test_docs.index(doc),i, 'raise')
+                found=True
+            i+=1
     
+    y_true_by_class={cat:np.zeros(len(test_docs),dtype=np.int8) for cat in categories}
     for cat in categories:
-        y_true_by_class[cat]=np.zeros(len(test_docs))
         for doc in test_docs:
             if doc in reuters.fileids(cat):
-                y_true_by_class[cat][test_docs.index(doc)]=1
+                np.put(y_true_by_class[cat], test_docs.index(doc), 1, 'raise')
+                
+    
+    
+    # Print and check dimensions         
+    print("TRAIN documents:" ,len(train_docs))
+    print("TEST documents:" ,len(test_docs))
+    print("Words in vocabulary: ", len(vocabulary))
+    
+    check=True
+
+    for y in y_true_by_class.items():
+        if y[1].size != len(test_docs):
+            check=False
+
+    print("True labels for f1 measure are of the correct size? ",  y_true.size==len(test_docs))
+    print("Binary true labels have all the correct size? ", check )
                 
     return categories,train_docs,test_docs,docs_in_class,vocabulary,words_in_class,y_true,y_true_by_class
                 
                 
-
-    
 def extractVocabulary(text):
     #vocabulary = list(set(tokenize(text)))
     vocabulary = set(tokenize(text))

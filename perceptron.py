@@ -6,6 +6,7 @@ import math
 from numpy import float64
 from scipy.sparse.bsr import bsr_matrix
 from nltk.metrics.scores import recall
+from random import randint
 
 
 def tf(docs):
@@ -67,26 +68,44 @@ def train(train_docs,rquad,tf,idf,docs_in_class,vocabulary,max_iter):
 
 
 def test(docs,weights,bias,tf,idf,vocabulary):
-    results=scores=np.zeros(len(docs))
+    results=np.zeros(len(docs),dtype=np.int8)
+    scores=np.zeros(len(docs))
     for d in docs:
         np.put(scores,docs.index(d),np.dot(weights,tfidf(tf,idf,d, vocabulary))+bias,'raise')
         if scores[docs.index(d)] > 0:
-            np.put(results,docs.index(d),1,'raise')
+            np.put(results,docs.index(d),np.int8(1),'raise')
     return results,scores
 
+def get_predict_labels(results,categories,dimension):
+    predictions=np.zeros(dimension,dtype=np.int8)
+
+    for i in range(0, predictions.size):
+        found=False
+        c=0
+        while not found and c<len(categories):
+            if results[categories[c]][i] != 0:
+                np.put(predictions,i,c,'raise')
+                found=True
+            c+=1
+  
+        if not found:
+            np.put(predictions,i,randint(0,len(categories)),'raise')
+            
+    return predictions
+    
+
+
+
 def pr_curve(scores):
-    #np.sort(scores)
-    for i in range(0,len(scores)):
-        print(scores[i])
-        
     minn=abs(np.amin(scores))
     trasl=np.array([s+minn for s in scores])
     maxx=np.amax(trasl)
     print(trasl)
-    #probPer=np.zeros(len(trasl))
-    probPer=np.array([t/maxx for t in trasl])
+    if maxx != 0:
+        probPer=np.array([t/maxx for t in trasl])
+    else:
+        probPer=np.ones(trasl.size)
     
-        
     return probPer
                 
 
