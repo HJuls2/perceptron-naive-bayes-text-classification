@@ -2,6 +2,7 @@ from collections import defaultdict
 import matplotlib.pyplot as plt
 from sklearn.metrics.ranking import precision_recall_curve
 from sklearn.metrics.classification import f1_score
+import numpy as np
 
 from manager import init
 from bernoulliNB import train_bernoulli, apply_bernoulli
@@ -22,7 +23,7 @@ def calc_break_even_point(y_true,scores):
     recall=0
     precision=1
     i=0
-    while recall != precision and i<len(pairs):
+    while round(recall,3) not in np.arange(round(precision-0.01,3),round(precision+0.01,3),0.001) and i<len(pairs):
         t=pairs[i][1]
         tps=len([ p[0] for p in pairs if p[1]>=t and p[0] == 1 ])
         fps=len([ p[0] for p in pairs if p[1]>=t and p[0] == 0 ])
@@ -31,10 +32,11 @@ def calc_break_even_point(y_true,scores):
         recall= tps/(tps+fns)
         precision= tps/(tps+fps)
         i+=1
-        
-    if recall == precision:
+    
+    if i !=len(pairs)-1:   
         break_even_point=recall
         
+    print(break_even_point)
     
     return break_even_point
             

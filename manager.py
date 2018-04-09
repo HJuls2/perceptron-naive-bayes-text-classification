@@ -12,6 +12,7 @@ def init():
     nltk.download('stopwords')
     nltk.download('punkt')
     categories='acq','corn','crude','earn','grain','interest','money-fx','ship','trade','wheat'
+    #categories='acq','corn','crude'
     train_docs = sorted(set(doc for c in categories for doc in reuters.fileids(c) if doc.startswith("train")))
     test_docs = sorted(set(doc for c in categories for doc in reuters.fileids(c) if doc.startswith("test")))
     docs_in_class={cat:set(filter(lambda doc: doc in reuters.fileids(cat),train_docs)) for cat in categories}
