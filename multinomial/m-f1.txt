@@ -1,0 +1,10 @@
+acq:0.68218527
+corn: 0.5
+crude: 
+earn: 0.61764706
+grain: 0.94614265
+interest: 0.277777778
+money-fx: 0.0
+ship: 0.18987342
+trade: 0.0
+wheat:0.0
