@@ -67,7 +67,7 @@ def main():
         idfi=perc.idf(train_docs, vocabulary)
         r=perc.calc_r(train_docs, vocabulary, tfi, idfi)
         print ("R = " , r)
-        max_iter=int(input("Enter max number of iterations performed by Perceptron (Advise: at least 10): "))
+        max_iter=int(input("Enter max number of iterations performed by Perceptron : "))
 
         for cat in categories:
             weights[cat],bias[cat],epochs[cat]=perc.train(train_docs,r**2,tfi,idfi,docs_in_class[cat],vocabulary,max_iter)
