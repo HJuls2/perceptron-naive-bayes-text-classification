@@ -15,7 +15,7 @@ def train_multinomial(train_set,docs_in_class,vocabulary):
     text=""
     for c in docs_in_class.keys():
         cat_tokens=list()
-        num_docs_in_class=len(docs_in_class)
+        num_docs_in_class=len(docs_in_class[c])
         prior[c] = num_docs_in_class/numdocs
 
         text=' '.join(list(reuters.raw(doc) for doc in train_set if doc in reuters.fileids(c)))

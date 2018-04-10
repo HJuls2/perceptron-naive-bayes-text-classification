@@ -33,7 +33,7 @@ def calc_break_even_point(y_true,scores):
         precision= tps/(tps+fps)
         i+=1
     
-    if i !=len(pairs)-1:   
+    if i !=len(pairs):   
         break_even_point=recall
         
     print(break_even_point)
