@@ -31,8 +31,7 @@ The exercise needs the following installed modules:
 * MatPlotLib
 
 ## Instructions
-Launching the main.py script the program executes training and testing (in the order) for Percetron, Bernoulli Naive Bayes and Multinomila Naive Bayes.
-Perceptron needs the setting of the max number of iterations to perform for each class.
+Launching the test.py script the program executes training and testing (in the order) for Percetron, Bernoulli Naive Bayes and Multinomial Naive Bayes, typing 'a' when requested. Otherwise, typing 'b' Bernoulli NB will run, 'm' for Multinomial and 'p' for Perceptron. Perceptron needs the setting of the max number of iterations to perform for each class.
 
 ## Credits
 
